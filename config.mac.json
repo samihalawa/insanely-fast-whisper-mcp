@@ -1,0 +1,10 @@
+{
+  "model_name": "openai/whisper-large-v3",
+  "device_id": "mps",
+  "batch_size": 4,
+  "flash": false,
+  "task": "transcribe",
+  "language": null,
+  "timestamp": "chunk",
+  "hf_token": null
+}

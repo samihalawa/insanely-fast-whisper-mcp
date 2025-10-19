@@ -1,0 +1,10 @@
+{
+  "model_name": "distil-whisper/large-v2",
+  "device_id": "0",
+  "batch_size": 32,
+  "flash": true,
+  "task": "transcribe",
+  "language": null,
+  "timestamp": "chunk",
+  "hf_token": null
+}

@@ -1,0 +1,101 @@
+name: insanely-fast-whisper-mcp
+version: 0.1.0
+description: Blazingly fast audio transcription using Whisper with Flash Attention 2
+icon: 🎙️
+category: audio
+tags:
+  - transcription
+  - whisper
+  - audio
+  - speech-to-text
+  - ai
+  - diarization
+
+# Runtime configuration
+runtime:
+  python: "3.10"
+
+# Required dependencies will be installed from pyproject.toml
+# Additional system dependencies if needed
+system_dependencies:
+  - ffmpeg
+
+# Environment variables
+environment:
+  TRANSFORMERS_CACHE: /tmp/transformers_cache
+  HF_HOME: /tmp/hf_home
+
+# Resource requirements (adjust based on your needs)
+resources:
+  memory: 8192  # 8GB RAM minimum for large models
+  gpu: true      # GPU recommended for fast transcription
+  gpu_memory: 16384  # 16GB VRAM recommended
+
+# Configuration schema for users
+config_schema:
+  model_name:
+    type: string
+    default: openai/whisper-large-v3
+    description: Whisper model to use
+    options:
+      - openai/whisper-large-v3
+      - distil-whisper/large-v2
+      - openai/whisper-large-v2
+      - openai/whisper-medium
+      - openai/whisper-small
+
+  device_id:
+    type: string
+    default: "0"
+    description: GPU device ID (0, 1, etc.) or 'mps' for Mac
+
+  batch_size:
+    type: integer
+    default: 24
+    description: Number of parallel batches (reduce if OOM)
+    min: 1
+    max: 64
+
+  flash:
+    type: boolean
+    default: false
+    description: Use Flash Attention 2 for faster processing
+
+  task:
+    type: string
+    default: transcribe
+    description: Task to perform
+    options:
+      - transcribe
+      - translate
+
+  language:
+    type: string
+    default: null
+    description: Language code (null for auto-detect)
+    optional: true
+
+  timestamp:
+    type: string
+    default: chunk
+    description: Timestamp granularity
+    options:
+      - chunk
+      - word
+
+  hf_token:
+    type: string
+    default: null
+    description: Hugging Face token for speaker diarization
+    optional: true
+    sensitive: true
+
+# MCP server configuration
+mcp:
+  server: whisper_mcp.server:create_server
+
+# Health check
+health_check:
+  path: /health
+  interval: 30
+  timeout: 10
