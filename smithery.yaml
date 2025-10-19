@@ -1,3 +1,4 @@
 name: insanely-fast-whisper-mcp
-description: Blazingly fast audio transcription using Whisper with Flash Attention 2
+description: Blazingly fast audio transcription using Whisper with Flash Attention 2. Optimized with Hugging Face Transformers pipeline for up to 70x speedup with Flash Attention 2. Supports speaker diarization, word-level timestamps, and multiple languages.
 runtime: python
+repository: https://github.com/samihalawa/insanely-fast-whisper-mcp
