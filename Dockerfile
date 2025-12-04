@@ -1,48 +1,33 @@
-# Use NVIDIA CUDA base image for GPU support
-FROM nvidia/cuda:12.1.0-base-ubuntu22.04
+# Build stage
+FROM node:18-alpine AS builder
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive \
-    TRANSFORMERS_CACHE=/tmp/transformers_cache \
-    HF_HOME=/tmp/hf_home
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip \
-    ffmpeg \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install uv package manager
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY pyproject.toml .
-COPY README.md .
-COPY src/ ./src/
+# Copy ALL source files first (needed for TypeScript compilation)
+COPY . .
 
-# Install Python dependencies
-RUN uv pip install --system -e .
+# Install ALL dependencies (skip prepare script to avoid premature build)
+RUN npm ci --ignore-scripts
 
-# Install insanely-fast-whisper
-RUN uv pip install --system insanely-fast-whisper
+# Build TypeScript explicitly
+RUN npm run build
 
-# Optional: Pre-download Whisper model (comment out if not needed)
-# RUN python3 -c "from transformers import AutoModelForSpeechSeq2Seq; AutoModelForSpeechSeq2Seq.from_pretrained('openai/whisper-large-v3')"
+# Production stage
+FROM node:18-alpine
 
-# Expose port
-EXPOSE 8000
+WORKDIR /app
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+# Copy package files
+COPY package*.json ./
 
-# Run the server
-CMD ["uv", "run", "mcp", "dev", "src/whisper_mcp/server.py:create_server"]
+# Install only production dependencies (skip prepare script)
+RUN npm ci --only=production --ignore-scripts
+
+# Copy built files from builder
+COPY --from=builder /app/dist ./dist
+
+# Set environment
+ENV NODE_ENV=production
+
+# Start the MCP server
+CMD ["node", "dist/index.js"]
