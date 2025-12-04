@@ -1,0 +1,8 @@
+{
+    "actorSpecification": 1,
+    "name": "whisper-transcription-mcp",
+    "title": "Whisper Transcription MCP",
+    "description": "MCP server for audio transcription using Whisper",
+    "version": "0.1",
+    "dockerfile": "./Dockerfile"
+}
