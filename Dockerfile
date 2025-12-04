@@ -1,33 +1,19 @@
-# Build stage
-FROM node:18-alpine AS builder
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy ALL source files first (needed for TypeScript compilation)
-COPY . .
+# Install uv for fast dependency management
+RUN pip install uv
 
-# Install ALL dependencies (skip prepare script to avoid premature build)
-RUN npm ci --ignore-scripts
+# Copy project files
+COPY pyproject.toml uv.lock ./
+COPY src ./src
 
-# Build TypeScript explicitly
-RUN npm run build
-
-# Production stage
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies (skip prepare script)
-RUN npm ci --only=production --ignore-scripts
-
-# Copy built files from builder
-COPY --from=builder /app/dist ./dist
+# Install dependencies
+RUN uv pip install --system .
 
 # Set environment
-ENV NODE_ENV=production
+ENV PYTHONUNBUFFERED=1
 
-# Start the MCP server
-CMD ["node", "dist/index.js"]
+# Run the MCP server
+CMD ["python", "-m", "insanely_fast_whisper_mcp"]
