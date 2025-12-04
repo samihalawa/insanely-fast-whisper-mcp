@@ -1,0 +1,4 @@
+mcp>=1.1.2
+fastmcp>=0.5.0
+insanely-fast-whisper>=0.0.15
+pydantic>=2.0.0
