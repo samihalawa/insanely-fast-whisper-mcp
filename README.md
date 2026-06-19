@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/samihalawa-insanely-fast-whisper-mcp-badge.png)](https://mseep.ai/app/samihalawa-insanely-fast-whisper-mcp)
+
 # Insanely Fast Whisper MCP Server
 
 Blazingly fast audio transcription MCP server using OpenAI's Whisper with optimizations from Hugging Face Transformers and Flash Attention 2.
